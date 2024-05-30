@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="F_GetSystemTime" Id="{f8de5fa5-62ac-4a47-972b-29a883a4808a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_GetSystemTime : ST_TimeStruct
+VAR
+	fbGetSystemTime : GETSYSTEMTIME; 
+    fileTime        : T_FILETIME;
+    sDT: STRING(30);
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbGetSystemTime(timeLoDW => fileTime.dwLowDateTime, timeHiDW => fileTime.dwHighDateTime);
+sDT := SYSTEMTIME_TO_STRING(FILETIME_TO_SYSTEMTIME(fileTime));
+
+F_GetSystemTime.wYear := STRING_TO_WORD(LEFT(sDt, 4));
+F_GetSystemTime.wMonth := STRING_TO_WORD(MID(sDt, 2, 6));
+F_GetSystemTime.wDay := STRING_TO_WORD(MID(sDt, 2, 9));
+F_GetSystemTime.wHour := STRING_TO_WORD(MID(sDt, 2, 12));
+F_GetSystemTime.wMinute := STRING_TO_WORD(MID(sDt, 2, 15));
+F_GetSystemTime.wSecond := STRING_TO_WORD(MID(sDt, 2, 18));
+F_GetSystemTime.wMilliseconds := STRING_TO_WORD(RIGHT(sDt, 3));]]></ST>
+    </Implementation>
+    <LineIds Name="F_GetSystemTime">
+      <LineId Id="22" Count="8" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

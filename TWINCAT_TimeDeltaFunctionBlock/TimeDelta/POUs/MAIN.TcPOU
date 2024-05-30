@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MAIN" Id="{78d2917f-3efd-400c-b9b5-d7f9be5bc87b}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	fbTimeDelta : FB_TimeDelta;
+	bStartButton : BOOL;
+	bStopButton : BOOL;
+	DisplayDeltaTime : ST_TimeStruct;
+	bStartButtonPressed : BOOL := FALSE; // Latch for Start button
+    bStopButtonPressed : BOOL := FALSE;  // Latch for Stop button
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbTimeDelta();
+
+// Logic for Start Button
+IF bStartButton AND NOT bStartButtonPressed THEN
+    fbTimeDelta.Start(); // Record the start time
+    bStartButtonPressed := FALSE; // Latch the start button
+END_IF
+
+// Reset the latch if the button is released
+IF NOT bStartButton THEN
+    bStartButtonPressed := FALSE;
+END_IF
+
+// Logic for Stop Button
+IF bStopButton AND NOT bStopButtonPressed THEN
+    fbTimeDelta.Stop(); // Record the stop time
+    bStopButtonPressed := TRUE; // Latch the stop button
+    
+    // Calculate and display the delta time
+    DisplayDeltaTime := fbTimeDelta.GetDelta();
+END_IF
+
+// Reset the latch if the button is released
+IF NOT bStopButton THEN
+    bStopButtonPressed := FALSE;
+END_IF
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="2" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="18" Count="3" />
+      <LineId Id="42" Count="3" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="46" Count="1" />
+      <LineId Id="29" Count="6" />
+      <LineId Id="49" Count="3" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="12" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

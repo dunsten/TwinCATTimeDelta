@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_TimeDelta" Id="{b5ea659c-d259-44ba-9ffb-24d656cf8516}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TimeDelta
+VAR
+	StartTime : ST_TimeStruct;
+    StopTime : ST_TimeStruct;
+    CurrentTime : ST_TimeStruct; // Assuming this to be cyclically updated to the current PLC time
+	fbGetSystemTime : GETSYSTEMTIME;
+    timeAsFileTime : T_FILETIME;
+    timeAsDT : DATE_AND_TIME;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[F_GetSystemTime(F_GetSystemTime => CurrentTime);
+GetDelta();
+
+
+
+
+
+]]></ST>
+    </Implementation>
+    <Method Name="GetDelta" Id="{dc148d7e-5e4a-4f58-9089-0c666953aba3}">
+      <Declaration><![CDATA[METHOD GetDelta : ST_TimeStruct
+VAR
+	DeltaTime : ST_TimeStruct;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Calculate the delta TIME here AND assign it TO DeltaTime
+	DeltaTime.wYear := StopTime.wYear - StartTime.wYear;
+    DeltaTime.wMonth := StopTime.wMonth - StartTime.wMonth;
+    DeltaTime.wDay := StopTime.wDay - StartTime.wDay;
+    DeltaTime.wHour := StopTime.wHour - StartTime.wHour;
+    DeltaTime.wMinute := StopTime.wMinute - StartTime.wMinute;
+    DeltaTime.wSecond := StopTime.wSecond - StartTime.wSecond;
+    DeltaTime.wMilliseconds := StopTime.wMilliseconds - StartTime.wMilliseconds;
+	
+// Adjust for negative values
+    IF DeltaTime.wMilliseconds < 0 THEN
+        DeltaTime.wMilliseconds := DeltaTime.wMilliseconds + 1000;
+        DeltaTime.wSecond := DeltaTime.wSecond - 1;
+    END_IF;
+    IF DeltaTime.wSecond < 0 THEN
+        DeltaTime.wSecond := DeltaTime.wSecond + 60;
+        DeltaTime.wMinute := DeltaTime.wMinute - 1;
+    END_IF;
+    IF DeltaTime.wMinute < 0 THEN
+        DeltaTime.wMinute := DeltaTime.wMinute + 60;
+        DeltaTime.wHour := DeltaTime.wHour - 1;
+    END_IF;
+    IF DeltaTime.wHour < 0 THEN
+        DeltaTime.wHour := DeltaTime.wHour + 24;
+        DeltaTime.wDay := DeltaTime.wDay - 1;
+    END_IF;
+    // Handle month and year adjustments as needed
+
+    GetDelta := DeltaTime;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Start" Id="{4d2d0b47-78d8-47e4-8b2c-a9bcca0370d5}">
+      <Declaration><![CDATA[METHOD Start : ST_TimeStruct
+VAR
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Assume CurrentTime is updated externally and cyclically with the current PLC time
+F_GetSystemTime(F_GetSystemTime => StartTime);
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Stop" Id="{be9a23e9-38d7-472e-8d3c-f7f558ab2be6}">
+      <Declaration><![CDATA[METHOD Stop : ST_TimeStruct
+VAR
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Assume CurrentTime is updated externally and cyclically with the current PLC time
+F_GetSystemTime(F_GetSystemTime => StopTime);]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_TimeDelta">
+      <LineId Id="62" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="52" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TimeDelta.GetDelta">
+      <LineId Id="38" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="40" Count="4" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="47" Count="18" />
+      <LineId Id="46" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TimeDelta.Start">
+      <LineId Id="25" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="15" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_TimeDelta.Stop">
+      <LineId Id="10" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
