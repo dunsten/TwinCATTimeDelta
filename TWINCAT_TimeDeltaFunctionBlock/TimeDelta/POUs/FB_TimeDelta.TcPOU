@@ -26,6 +26,8 @@ GetDelta();
       <Declaration><![CDATA[METHOD GetDelta : ST_TimeStruct
 VAR
 	DeltaTime : ST_TimeStruct;
+	DaysInMonth : ARRAY[0..12] OF WORD := [0,31,28,31,30,31,30,31,31,30,31,30,31]; // Days in each month
+	bLeapYear : BOOL;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -38,25 +40,63 @@ END_VAR
     DeltaTime.wSecond := StopTime.wSecond - StartTime.wSecond;
     DeltaTime.wMilliseconds := StopTime.wMilliseconds - StartTime.wMilliseconds;
 	
-// Adjust for negative values
-    IF DeltaTime.wMilliseconds < 0 THEN
-        DeltaTime.wMilliseconds := DeltaTime.wMilliseconds + 1000;
-        DeltaTime.wSecond := DeltaTime.wSecond - 1;
+// Calculate delta time
+    IF StartTime.wMilliseconds > StopTime.wMilliseconds THEN
+        DeltaTime.wMilliseconds := 65535 - DeltaTime.wMilliseconds;
     END_IF;
-    IF DeltaTime.wSecond < 0 THEN
-        DeltaTime.wSecond := DeltaTime.wSecond + 60;
-        DeltaTime.wMinute := DeltaTime.wMinute - 1;
-    END_IF;
-    IF DeltaTime.wMinute < 0 THEN
-        DeltaTime.wMinute := DeltaTime.wMinute + 60;
-        DeltaTime.wHour := DeltaTime.wHour - 1;
-    END_IF;
-    IF DeltaTime.wHour < 0 THEN
-        DeltaTime.wHour := DeltaTime.wHour + 24;
-        DeltaTime.wDay := DeltaTime.wDay - 1;
-    END_IF;
-    // Handle month and year adjustments as needed
 
+    IF StartTime.wSecond > StopTime.wSecond  THEN
+        DeltaTime.wSecond := 65535 - DeltaTime.wSecond;
+    END_IF;
+	
+    IF StartTime.wMinute > StopTime.wMinute THEN
+        DeltaTime.wMinute := 65535 - DeltaTime.wMinute;
+    END_IF;
+
+	IF StartTime.wHour > StopTime.wHour THEN
+        DeltaTime.wHour := 65535 - DeltaTime.wHour;
+    END_IF;
+
+    // Adjust for overflows
+    IF DeltaTime.wMilliseconds >= 1000 THEN
+        DeltaTime.wMilliseconds := DeltaTime.wMilliseconds - 1000;
+        DeltaTime.wSecond := DeltaTime.wSecond + 1;
+    END_IF;
+
+    IF DeltaTime.wSecond >= 60 THEN
+        DeltaTime.wSecond := DeltaTime.wSecond - 60;
+        DeltaTime.wMinute := DeltaTime.wMinute + 1;
+    END_IF;
+
+    IF DeltaTime.wMinute >= 60 THEN
+        DeltaTime.wMinute := DeltaTime.wMinute - 60;
+        DeltaTime.wHour := DeltaTime.wHour + 1;
+    END_IF;
+
+    IF DeltaTime.wHour >= 24 THEN
+        DeltaTime.wHour := DeltaTime.wHour - 24;
+        DeltaTime.wDay := DeltaTime.wDay + 1;
+    END_IF;
+
+    // Check for leap year
+    bLeapYear := ((StartTime.wYear MOD 4 = 0) AND (StartTime.wYear MOD 100 <> 0)) OR (StartTime.wYear MOD 400 = 0);
+    IF bLeapYear THEN
+        DaysInMonth[2] := 29;
+    ELSE
+        DaysInMonth[2] := 28;
+    END_IF;
+
+    IF DeltaTime.wDay >= DaysInMonth[StartTime.wMonth] THEN
+        DeltaTime.wDay := DeltaTime.wDay - DaysInMonth[StartTime.wMonth];
+        DeltaTime.wMonth := DeltaTime.wMonth + 1;
+    END_IF;
+
+    IF DeltaTime.wMonth >= 12 THEN
+        DeltaTime.wMonth := DeltaTime.wMonth - 12;
+        DeltaTime.wYear := DeltaTime.wYear + 1;
+    END_IF;
+
+    // Return the calculated delta time
     GetDelta := DeltaTime;]]></ST>
       </Implementation>
     </Method>
@@ -98,7 +138,18 @@ F_GetSystemTime(F_GetSystemTime => StopTime);]]></ST>
       <LineId Id="40" Count="4" />
       <LineId Id="37" Count="0" />
       <LineId Id="45" Count="0" />
-      <LineId Id="47" Count="18" />
+      <LineId Id="167" Count="0" />
+      <LineId Id="169" Count="1" />
+      <LineId Id="172" Count="0" />
+      <LineId Id="178" Count="2" />
+      <LineId Id="182" Count="0" />
+      <LineId Id="269" Count="0" />
+      <LineId Id="189" Count="1" />
+      <LineId Id="192" Count="0" />
+      <LineId Id="198" Count="0" />
+      <LineId Id="270" Count="1" />
+      <LineId Id="202" Count="0" />
+      <LineId Id="228" Count="40" />
       <LineId Id="46" Count="0" />
     </LineIds>
     <LineIds Name="FB_TimeDelta.Start">

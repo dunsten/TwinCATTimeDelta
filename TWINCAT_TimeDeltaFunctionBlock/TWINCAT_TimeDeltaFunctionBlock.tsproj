@@ -10,7 +10,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{670896A3-9ECB-4118-842F-71FEFD99DCEC}" Name="TimeDelta" PrjFilePath="TimeDelta\TimeDelta.plcproj" TmcFilePath="TimeDelta\TimeDelta.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcHash="{0F99BCC0-A1CF-BA7B-0DDC-82EF630563B0}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="TimeDelta\TimeDelta.tmc" TmcHash="{4394DA9D-7949-560A-2B82-0DC9CDA8443A}">
 					<Name>TimeDelta Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Contexts>
